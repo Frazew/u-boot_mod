@@ -118,6 +118,41 @@ U_BOOT_CMD(setmac, 2, 0, do_set_mac, "save new MAC address in FLASH\n", "xx:xx:x
 
 #endif /* if defined(CONFIG_CMD_MAC) && defined(OFFSET_MAC_ADDRESS) */
 
+
+/*
+ * Unlock console
+ */
+int do_unlock(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[]){
+	char* passwd = "tototo";
+	int i = 0, inputlen;
+	extern char console_buffer[];
+
+	// allow only 1 argument, the command name
+	if(argc != 1) {
+		print_cmd_help(cmdtp);
+		return(1);
+	}
+
+	inputlen = readpass("password: ");
+
+	if (inputlen != strlen(passwd)) {
+		printf_err("Invalid password length\n");
+		return(1);
+	}
+
+	for(i = 0; i < inputlen; i++){
+		if(console_buffer[i] != passwd[i]){
+			printf_err("Invalid password\n");
+			return(1);		
+		}
+	}
+
+	setenv("locked", NULL);
+	return(0);
+}
+
+U_BOOT_CMD(unlock, 1, 0, do_unlock, "unlock the prompt\n", NULL);
+
 #if defined(OFFSET_ROUTER_MODEL)
 /*
  * Show TP-Link router model

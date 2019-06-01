@@ -170,6 +170,11 @@
 				"echo Starting network console...;" \
 				"setenv stop_boot 1;" \
 				"echo;" \
+				"setenv locked 1;" \
+				"setenv netretry once;" \
+				"setenv vlan 30;" \
+				"setenv serverip 192.168.30.2;" \
+				"dhcp;" \
 				"startnc;" \
 			"elif itest $cnt >= 5; then " \
 				"echo Starting U-Boot console...;" \

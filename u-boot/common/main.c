@@ -344,6 +344,15 @@ void main_loop(void)
  */
 int readline(const char * const prompt)
 {
+	return _readline(prompt, 0);
+}
+int readpass(const char * const prompt)
+{
+	return _readline(prompt, 1);
+}
+
+int _readline(const char * const prompt, const int password)
+{
 	char *p = console_buffer;
 	int plen = 0;	/* prompt length     */
 	int n = 0;	/* buffer index      */
@@ -410,7 +419,8 @@ int readline(const char * const prompt)
 				} else {
 					/* Echo input */
 					++col;
-					putc(c);
+					if (password) putc('*');
+					else putc(c);
 				}
 
 				*p++ = c;

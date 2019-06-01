@@ -180,7 +180,9 @@ unsigned int main_cpu_clk(void);
 /* common/main.c */
 void	main_loop		(void);
 int		run_command		(const char *cmd, int flag);
+int   _readline    (const char *const prompt, const int);
 int		readline 		(const char *const prompt);
+int   readpass    (const char *const prompt);
 void	init_cmd_timeout(void);
 void	reset_cmd_timeout(void);
 

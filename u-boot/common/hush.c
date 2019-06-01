@@ -408,7 +408,11 @@ static void get_user_input(struct in_str *i) {
 				do_repeat = 1;
 			}
 		}
-		i->p = the_command;
+		if (getenv("locked") != NULL && strcmp(the_command, "unlock\n") != 0) {
+			printf("Console is locked\n");
+			i->p = "unlock\n";
+		}
+		else i->p = the_command;
 	} else {
 		if (console_buffer[0] != '\n') {
 			if (strlen(the_command) + strlen(console_buffer) < CFG_CBSIZE) {
@@ -425,7 +429,11 @@ static void get_user_input(struct in_str *i) {
 			the_command[0] = '\n';
 			the_command[1] = '\0';
 		}
-		i->p = console_buffer;
+		if (getenv("locked") != NULL && strcmp(the_command, "unlock\n") != 0) {
+			printf("Console is locked\n");
+			i->p = "unlock\n";
+		}
+		else i->p = console_buffer;
 	}
 }
 
