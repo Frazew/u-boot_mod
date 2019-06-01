@@ -26,7 +26,7 @@
 
 /* Use 115200 as default baudrate */
 #if !defined(CONFIG_BAUDRATE)
-	#define CONFIG_BAUDRATE	115200
+	#define CONFIG_BAUDRATE	9600
 #endif
 
 /* CLI parser, prompt */
