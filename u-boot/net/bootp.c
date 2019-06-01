@@ -597,7 +597,7 @@ static int BootpExtended(u8 *e)
 void BootpRequest(void)
 {
 	volatile uchar *pkt, *iphdr;
-	int ext_len, pktlen, iplen;
+	int ext_len, pktlen, iplen, hdrlen;
 	bd_t *bd = gd->bd;
 	Bootp_t *bp;
 
@@ -681,7 +681,8 @@ void BootpRequest(void)
 	pkt = NetTxPacket;
 	memset((void*)pkt, 0, PKTSIZE);
 
-	pkt += NetSetEther(pkt, NetBcastAddr, PROT_IP);
+	hdrlen += NetSetEther(pkt, NetBcastAddr, PROT_IP);
+	pkt += hdrlen;
 
 	/*
 	 * Next line results in incorrect packet size being transmitted, resulting
@@ -695,10 +696,10 @@ void BootpRequest(void)
 	/* We need this later for NetSetIP() */
 	iphdr = pkt;
 	pkt  += IP_HDR_SIZE;
-
 	bp = (Bootp_t *)pkt;
 
 	bp->bp_op    = OP_BOOTREQUEST;
+	printf("Mandatory print here or else nothing works (??)... \n");
 	bp->bp_htype = HWT_ETHER;
 	bp->bp_hlen  = HWL_ETHER;
 	bp->bp_hops  = 0;
@@ -710,16 +711,13 @@ void BootpRequest(void)
 	NetWriteIP(&bp->bp_giaddr, 0);
 
 	memcpy(bp->bp_chaddr, NetOurEther, 6);
-
 	copy_filename(bp->bp_file, BootFile, sizeof(bp->bp_file));
-
 	/* Request additional information from the BOOTP/DHCP server */
 #if defined(CONFIG_CMD_DHCP)
 	ext_len = DhcpExtended((u8 *)bp->bp_vend, DHCP_DISCOVER, 0, 0);
 #else
 	ext_len = BootpExtended((u8 *)bp->bp_vend);
 #endif /* CONFIG_CMD_DHCP */
-
 	/*
 	 * Bootp ID is the lower 4 bytes of our ethernet address
 	 * plus the current time in HZ
@@ -733,13 +731,12 @@ void BootpRequest(void)
 	BootpID = htonl(BootpID);
 
 	NetCopyLong(&bp->bp_id, &BootpID);
-
 	/*
 	 * Calculate proper packet lengths taking into account the
 	 * variable size of the options field
 	 */
 	pktlen = BOOTP_SIZE     - sizeof(bp->bp_vend) + ext_len;
-	iplen  = BOOTP_HDR_SIZE - sizeof(bp->bp_vend) + ext_len;
+	iplen  = BOOTP_SIZE_NO_HDR - sizeof(bp->bp_vend) + ext_len + hdrlen;
 
 	NetSetIP(iphdr, 0xFFFFFFFFL, PORT_BOOTPS, PORT_BOOTPC, iplen);
 	NetSetTimeout(SELECT_TIMEOUT * CFG_HZ, BootpTimeout);
@@ -902,7 +899,7 @@ static int DhcpMessageType(unsigned char *popt)
 static void DhcpSendRequestPkt(Bootp_t *bp_offer)
 {
 	volatile uchar *pkt, *iphdr;
-	int pktlen, iplen, extlen;
+	int pktlen, iplen, extlen, hdrlen;
 	IPaddr_t OfferedIP;
 	bd_t *bd = gd->bd;
 	Bootp_t *bp;
@@ -912,7 +909,8 @@ static void DhcpSendRequestPkt(Bootp_t *bp_offer)
 	pkt = NetTxPacket;
 	memset((void*)pkt, 0, PKTSIZE);
 
-	pkt += NetSetEther(pkt, NetBcastAddr, PROT_IP);
+	hdrlen += NetSetEther(pkt, NetBcastAddr, PROT_IP);
+	pkt += hdrlen;
 
 	/* We'll need this later to set proper pkt size */
 	iphdr = pkt;
@@ -921,6 +919,7 @@ static void DhcpSendRequestPkt(Bootp_t *bp_offer)
 	bp = (Bootp_t *)pkt;
 
 	bp->bp_op    = OP_BOOTREQUEST;
+	printf("Mandatory print here or else nothing works (??)... \n");
 	bp->bp_htype = HWT_ETHER;
 	bp->bp_hlen  = HWL_ETHER;
 	bp->bp_hops  = 0;
@@ -941,7 +940,7 @@ static void DhcpSendRequestPkt(Bootp_t *bp_offer)
 	extlen = DhcpExtended((u8 *)bp->bp_vend,
 			      DHCP_REQUEST, NetDHCPServerIP, OfferedIP);
 
-	pktlen = BOOTP_SIZE     - sizeof(bp->bp_vend) + extlen;
+	pktlen = BOOTP_SIZE_NO_HDR     - sizeof(bp->bp_vend) + extlen + hdrlen;
 	iplen  = BOOTP_HDR_SIZE - sizeof(bp->bp_vend) + extlen;
 
 	NetSetIP(iphdr, 0xFFFFFFFFL, PORT_BOOTPS, PORT_BOOTPC, iplen);

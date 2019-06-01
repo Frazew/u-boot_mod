@@ -428,6 +428,8 @@ int NetLoop(proto_t protocol){
 					/* Start with a clean slate... */
 					BootpTry = 0;
 					NetOurIP = 0;
+					NetOurVLAN			= getenv_VLAN("vlan");
+					NetOurNativeVLAN	= getenv_VLAN("nvlan");
 					NetServerIP = getenv_IPaddr("serverip");
 					DhcpRequest(); /* Basically same as BOOTP */
 					break;

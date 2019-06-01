@@ -48,7 +48,7 @@ typedef struct
 }	Bootp_t;
 
 #define BOOTP_HDR_SIZE	sizeof (Bootp_t)
-#define BOOTP_SIZE	(ETHER_HDR_SIZE + IP_HDR_SIZE + BOOTP_HDR_SIZE)
+#define BOOTP_SIZE_NO_HDR	(IP_HDR_SIZE + BOOTP_HDR_SIZE)
 
 /**********************************************************************/
 /*
