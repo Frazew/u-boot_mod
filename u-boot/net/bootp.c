@@ -600,6 +600,8 @@ void BootpRequest(void)
 	int ext_len, pktlen, iplen, hdrlen;
 	bd_t *bd = gd->bd;
 	Bootp_t *bp;
+	
+	hdrlen = 0;
 
 #if defined(CONFIG_CMD_DHCP)
 	dhcp_state = INIT;
@@ -699,7 +701,7 @@ void BootpRequest(void)
 	bp = (Bootp_t *)pkt;
 
 	bp->bp_op    = OP_BOOTREQUEST;
-	printf("Mandatory print here or else nothing works (??)... \n");
+	printf("Mandatory print here or else nothing works ??... \n");
 	bp->bp_htype = HWT_ETHER;
 	bp->bp_hlen  = HWL_ETHER;
 	bp->bp_hops  = 0;
@@ -735,8 +737,8 @@ void BootpRequest(void)
 	 * Calculate proper packet lengths taking into account the
 	 * variable size of the options field
 	 */
-	pktlen = BOOTP_SIZE     - sizeof(bp->bp_vend) + ext_len;
-	iplen  = BOOTP_SIZE_NO_HDR - sizeof(bp->bp_vend) + ext_len + hdrlen;
+	pktlen = BOOTP_SIZE_NO_HDR     - sizeof(bp->bp_vend) + ext_len + hdrlen;
+	iplen  = BOOTP_HDR_SIZE - sizeof(bp->bp_vend) + ext_len;
 
 	NetSetIP(iphdr, 0xFFFFFFFFL, PORT_BOOTPS, PORT_BOOTPC, iplen);
 	NetSetTimeout(SELECT_TIMEOUT * CFG_HZ, BootpTimeout);
@@ -904,6 +906,7 @@ static void DhcpSendRequestPkt(Bootp_t *bp_offer)
 	bd_t *bd = gd->bd;
 	Bootp_t *bp;
 
+	hdrlen = 0;
 	debug("DhcpSendRequestPkt: Sending DHCPREQUEST\n");
 
 	pkt = NetTxPacket;
@@ -919,7 +922,7 @@ static void DhcpSendRequestPkt(Bootp_t *bp_offer)
 	bp = (Bootp_t *)pkt;
 
 	bp->bp_op    = OP_BOOTREQUEST;
-	printf("Mandatory print here or else nothing works (??)... \n");
+	printf("Mandatory print here or else nothing works ??... \n");
 	bp->bp_htype = HWT_ETHER;
 	bp->bp_hlen  = HWL_ETHER;
 	bp->bp_hops  = 0;
